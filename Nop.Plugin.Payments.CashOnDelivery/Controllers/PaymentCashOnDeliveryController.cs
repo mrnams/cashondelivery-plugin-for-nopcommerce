@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Castle.Core.Logging;
+using Microsoft.AspNetCore.Mvc;
 using Nop.Core;
 using Nop.Plugin.Payments.CashOnDelivery.Models;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
+using Nop.Services.Messages;
 using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
@@ -21,7 +23,8 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
         private readonly ILocalizationService _localizationService;
         private readonly ILanguageService _languageService;
         private readonly IPermissionService _permissionService;
-
+        private readonly ILogger _logger;
+        private readonly INotificationService _notificationService;
         #endregion
 
         #region Ctor
@@ -30,14 +33,18 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
             IStoreContext storeContext,
             ISettingService settingService,
             ILocalizationService localizationService,
+            ILogger logger,
+            INotificationService notificationService,
             ILanguageService languageService,
             IPermissionService permissionService)
         {
-            this._storeContext = storeContext;
-            this._settingService = settingService;
-            this._localizationService = localizationService;
-            this._languageService = languageService;
-            this._permissionService = permissionService;
+            _storeContext = storeContext;
+            _settingService = settingService;
+            _localizationService = localizationService;
+            _logger = logger;
+            _notificationService = notificationService;
+            _languageService = languageService;
+            _permissionService = permissionService;
         }
 
         #endregion
@@ -117,8 +124,7 @@ namespace Nop.Plugin.Payments.CashOnDelivery.Controllers
                     localized.LanguageId,
                     localized.DescriptionText);
             }
-
-            SuccessNotification(_localizationService.GetResource("Admin.Plugins.Saved"));
+            _notificationService.SuccessNotification(_localizationService.GetResource("Admin.Plugins.Saved"));
 
             return Configure();
         }
